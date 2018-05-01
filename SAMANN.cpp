@@ -73,24 +73,7 @@ ObjectMatrix SAMANN::getProjection()
     initializeExitMatrixes();   // Y_pasl, Y_is
     initializeDeltaL();    // delta_L
 
-    std::vector<double> w1Row, w2Row;
-    w1Row.reserve(n + 1);
-    w2Row.reserve(nNeurons + 1);
-    for (int i = 0; i < nNeurons + 1; i++)
-    {
-        for (int j = 0; j < n + 1; j++)
-            w1Row.push_back(0.0);
-        best_w1.push_back(w1Row);
-        w1Row.clear();
-    }
-
-    for (int i = 0; i < d + 1; i++)
-    {
-        for (int j = 0; j < nNeurons + 1; j++)
-            w2Row.push_back(0.0);
-        best_w2.push_back(w2Row);
-        w2Row.clear();
-    }
+    initializeBestWeights(n, best_w1, best_w2);
 
     lambda = getLambda();
 
@@ -210,20 +193,7 @@ ObjectMatrix SAMANN::getProjection()
             }
         }
 
-        currStress = getStress();
-        if (currStress < bestStress)
-        {
-            for (int i = 1; i <= nNeurons; i++)
-                for (int j = 0; j < n + 1; j++)
-                    best_w1[i][j] = w1.at(i).at(j);
-
-            for (int i = 0; i < d + 1; i++)
-                for (int j = 0; j < nNeurons + 1; j++)
-                    best_w2[i][j] = w2.at(i).at(j);
-
-            bestStress = currStress;
-        }
-        stressErrors.push_back(currStress);
+        stressTest(n, bestStress, currStress, best_w1, best_w2);
     }  // iteraciju pabaiga
 
     for (int miu = 0; miu < m; miu++)
@@ -262,6 +232,46 @@ ObjectMatrix SAMANN::getProjection()
     Y.setPrintClass(tmpX.getStringClassAttributes());
 
     return Y;
+}
+
+void SAMANN::stressTest(int n, double bestStress, double currStress, std::vector<std::vector<double>> &best_w1,
+                        std::vector<std::vector<double>> &best_w2) {
+    currStress = getStress();
+    if (currStress < bestStress)
+        {
+            for (int i = 1; i <= nNeurons; i++)
+                for (int j = 0; j < n + 1; j++)
+                    best_w1[i][j] = w1.at(i).at(j);
+
+            for (int i = 0; i < d + 1; i++)
+                for (int j = 0; j < nNeurons + 1; j++)
+                    best_w2[i][j] = w2.at(i).at(j);
+
+            bestStress = currStress;
+        }
+    stressErrors.push_back(currStress);
+}
+
+void SAMANN::initializeBestWeights(int n, std::vector<std::vector<double>> &best_w1,
+                                   std::vector<std::vector<double>> &best_w2) const {
+    std::__1::vector<double> w1Row, w2Row;
+    w1Row.reserve(n + 1);
+    w2Row.reserve(nNeurons + 1);
+    for (int i = 0; i < nNeurons + 1; i++)
+    {
+        for (int j = 0; j < n + 1; j++)
+            w1Row.push_back(0.0);
+        best_w1.push_back(w1Row);
+        w1Row.clear();
+    }
+
+    for (int i = 0; i < d + 1; i++)
+    {
+        for (int j = 0; j < nNeurons + 1; j++)
+            w2Row.push_back(0.0);
+        best_w2.push_back(w2Row);
+        w2Row.clear();
+    }
 }
 
 double SAMANN::getMax()
@@ -344,7 +354,6 @@ void SAMANN::getXp()
 
 bool SAMANN::isIdentical(DataObject obj)
 {
-    bool ats = false;
     int n = Xp.getObjectCount();
     int m = obj.getFeatureCount();
     int k = 0;
@@ -360,11 +369,10 @@ bool SAMANN::isIdentical(DataObject obj)
                 k++;
         if (k == m)
         {
-            ats = true;
-            break;
+            return true;
         }
     }
-    return ats;
+    return false;
 }
 
 double SAMANN::getStress()

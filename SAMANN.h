@@ -139,5 +139,10 @@ private:
      *  \brief temporary X matrix
      */
     ObjectMatrix tmpX;
+
+    void initializeBestWeights(int n, std::vector<std::vector<double>> &best_w1, std::vector<std::vector<double>> &best_w2) const;
+
+    void stressTest(int n, double bestStress, double currStress, std::vector<std::vector<double>> &best_w1,
+                    std::vector<std::vector<double>> &best_w2);
 };
 #endif // !defined(SAMMAN_H)
