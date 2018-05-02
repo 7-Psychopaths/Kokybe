@@ -9,10 +9,6 @@ MLP::MLP(int h1pNo, int h2pNo, double qtty, int maxIter, bool validationMethod)
     //no of neurons in hidden layer
     h1No = h1pNo;
     h2No = h2pNo;
-    //   param = qtty;
-    // this->dL = dL; //learning
-    // this->dT = dT; //testing
-    //   this->decay = wDecay;
     this->maxIter = maxIter;
     this->kFoldValidation = validationMethod;
 
@@ -67,7 +63,6 @@ MLP::~MLP()
 
 ObjectMatrix MLP::getProjection()
 {
-    //int cols = X.getClassCount();
     int ftCount = X.getObjectAt(0).getFeatureCount();
     int objCount = X.getObjectCount();
 
