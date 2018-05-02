@@ -224,7 +224,6 @@ ObjectMatrix SAMANN::getProjection()
         for (int j = 1; j <= d; j++)
             Yrow.push_back(objY_isNiu.getFeatureAt(j));
         Y.addObject(DataObject(Yrow), tmpX.getObjectAt(i).getClassLabel());
-        // std::cout << tmpX.getObjectAt(i).getClassLabel() << std::endl;
         Yrow.clear();
     }
 
