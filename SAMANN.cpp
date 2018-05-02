@@ -225,7 +225,7 @@ ObjectMatrix SAMANN::getProjection()
         for (int j = 1; j <= d; j++)
             Yrow.push_back(objY_isNiu.getFeatureAt(j));
         Y.addObject(DataObject(Yrow), tmpX.getObjectAt(i).getClassLabel());
-       // std::cout << tmpX.getObjectAt(i).getClassLabel() << std::endl;
+        // std::cout << tmpX.getObjectAt(i).getClassLabel() << std::endl;
         Yrow.clear();
     }
 
@@ -238,17 +238,17 @@ void SAMANN::stressTest(int n, double bestStress, double currStress, std::vector
                         std::vector<std::vector<double>> &best_w2) {
     currStress = getStress();
     if (currStress < bestStress)
-        {
-            for (int i = 1; i <= nNeurons; i++)
-                for (int j = 0; j < n + 1; j++)
-                    best_w1[i][j] = w1.at(i).at(j);
+    {
+        for (int i = 1; i <= nNeurons; i++)
+            for (int j = 0; j < n + 1; j++)
+                best_w1[i][j] = w1.at(i).at(j);
 
-            for (int i = 0; i < d + 1; i++)
-                for (int j = 0; j < nNeurons + 1; j++)
-                    best_w2[i][j] = w2.at(i).at(j);
+        for (int i = 0; i < d + 1; i++)
+            for (int j = 0; j < nNeurons + 1; j++)
+                best_w2[i][j] = w2.at(i).at(j);
 
-            bestStress = currStress;
-        }
+        bestStress = currStress;
+    }
     stressErrors.push_back(currStress);
 }
 
