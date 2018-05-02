@@ -12,8 +12,6 @@
 #include "DistanceMetrics.h"
 #include "math.h"
 #include "AdditionalMethods.h"
-//#include <fstream>
-//#include <iomanip>
 #include <float.h>
 #include <iostream>
 
@@ -164,7 +162,8 @@ ObjectMatrix SAMANN::getProjection()
                     ddelta_tarp[niu] = delta_tarp[niu] * (1. - objY_paslNiu.getFeatureAt(j)) * objY_paslNiu.getFeatureAt(j);
 
                     for (int k = 1; k < n + 1; k++)
-                        w1[j][k] = -1. * eta * (ddelta_tarp[miu] * objXpMiu.getFeatureAt(k) - ddelta_tarp[niu] * objXpNiu.getFeatureAt(k)) + w1[j][k];
+                        w1[j][k] = -1. * eta * (ddelta_tarp[miu] * objXpMiu.getFeatureAt(k) -
+                                                ddelta_tarp[niu] * objXpNiu.getFeatureAt(k)) + w1[j][k];
                 }
             }
         }
