@@ -98,24 +98,7 @@ ObjectMatrix SOM::getProjection()
 
         for (int l = 0; l < m; l++)
         {
-            win_dist = DBL_MAX;
-            win_x = 0;
-            win_y = 0;
-            objXtmp = X.getObjectAt(l);
-
-            for (int i = 0; i < k_x; i++)
-            {
-                for (int j = 0; j < k_y; j++)
-                {
-                    dist_ij = DistanceMetrics::getDistance(M->getObjectAt(i, j), objXtmp, EUCLIDEAN);
-                    if (dist_ij < win_dist)
-                    {
-                        win_dist = dist_ij;
-                        win_x = i;
-                        win_y = j;
-                    }
-                }
-            }
+			findShortestDistance(win_dist, win_x, win_y, objXtmp, l, dist_ij, M);
             for (int i = 0; i < k_x ; i++)
             {
                 for (int j = 0 ; j < k_y ; j++)
@@ -142,24 +125,7 @@ ObjectMatrix SOM::getProjection()
     std::vector<std::string> objClass;
     for (int l = 0; l < m; l++)
     {
-        win_dist = DBL_MAX;
-        win_x = 0;
-        win_y = 0;
-        objXtmp = X.getObjectAt(l);
-        for (int i = 0; i < k_x; i++)
-        {
-            for (int j = 0; j < k_y; j++)
-            {
-                dist_ij = DistanceMetrics::getDistance(M->getObjectAt(i, j), objXtmp, EUCLIDEAN);
-
-                if (dist_ij < win_dist)
-                {
-                    win_dist = dist_ij;
-                    win_x = i;
-                    win_y = j;
-                }
-            }
-        }
+		findShortestDistance(win_dist, win_x, win_y, objXtmp, l, dist_ij, M);
         // std::string cls = std::to_string(win_x) + "-" + std::to_string(win_y);
 
         if (returnWinners == false)
@@ -194,6 +160,28 @@ ObjectMatrix SOM::getProjection()
         nWinner = Different(M_w);
 
     return  nWinner;
+}
+
+void SOM::findShortestDistance(double &win_dist, int &win_x, int &win_y, DataObject &objXtmp, int l, double &dist_ij, ObjectMatrix * M)
+{
+	win_dist = DBL_MAX;
+	win_x = 0;
+	win_y = 0;
+	objXtmp = X.getObjectAt(l);
+
+	for (int i = 0; i < k_x; i++)
+	{
+		for (int j = 0; j < k_y; j++)
+		{
+			dist_ij = DistanceMetrics::getDistance(M->getObjectAt(i, j), objXtmp, EUCLIDEAN);
+			if (dist_ij < win_dist)
+			{
+				win_dist = dist_ij;
+				win_x = i;
+				win_y = j;
+			}
+		}
+	}
 }
 
 double SOM::Max(double d1, double d2)

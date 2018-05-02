@@ -68,6 +68,8 @@ public:
      */
     virtual ObjectMatrix getProjection();
 
+	void findShortestDistance(double &win_dist, int &win_x, int &win_y, DataObject &objXtmp, int l, double &dist_ij, ObjectMatrix * M);
+
 private:
     /*! \fn double Max(double number1, double number2);
      *  \brief Returns the bigger number.
