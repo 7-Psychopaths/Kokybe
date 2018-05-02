@@ -126,7 +126,6 @@ ObjectMatrix SOM::getProjection()
     for (int l = 0; l < m; l++)
     {
 		findShortestDistance(win_dist, win_x, win_y, objXtmp, l, dist_ij, M);
-        // std::string cls = std::to_string(win_x) + "-" + std::to_string(win_y);
 
         if (returnWinners == false)
             objClass.push_back(std::to_string(static_cast<long long>(win_x)) + "-" + std::to_string(static_cast<long long>(win_y)));
