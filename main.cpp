@@ -43,7 +43,6 @@ std::string AdditionalMethods::inputDataFile = ""; // input data file that will 
 
 //void PrintMatrix(ObjectMatrix);                                                 // Y atvaizdavimas ekrane (testavimui)
 double strToDouble(std::string);                                                // command line parameter to double type
-void FindAlgorithm(std::string &tmp, CommandLineParser &cmdLine, int pid, int numOfProcs, std::string &resultFile, std::string &statFile);
 int strToInt(std::string cmdParam);
 
 template <typename T>                                             // command line parameter to int type
@@ -116,7 +115,134 @@ int main(int argc, char** argv)
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
 
         Statistics::initSeed();
-		FindAlgorithm(tmp, cmdLine, pid, numOfProcs, resultFile, statFile);
+    switch(tmp) // <- ThisMM
+	  {
+		case "PCA":
+            tmp = cmdLine.get_arg("-projType");
+            std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+
+            if (tmp == "0" || tmp == "FALSE" )
+            {
+                PCA_ *method = new PCA_(strToInt(cmdLine.get_arg("-d")), false);
+                paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+            }
+            else
+            {
+                PCA_ *method = new PCA_(strToDouble(cmdLine.get_arg("-d")), true);
+
+                paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+            }
+			         break;
+        case "DMA":
+            DMA *method = new DMA(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), 
+				strToInt(cmdLine.get_arg("-d")), strToInt(cmdLine.get_arg("-neighbour")));
+            //std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter")) << strToInt(cmdLine.get_arg("-d")) 
+			//<< strToInt(cmdLine.get_arg("-neighbour"));
+            paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+			         break;
+        case "RELATIVEMDS":
+            int pEnum = strToInt(cmdLine.get_arg("-selStrategy"));
+            //SDS(double eps, int maxIter, int d, ProjectionEnum baseVectInitt, int nofBaseVect, DistanceMetricsEnum distMetrics);
+            SDS *method;
+
+            if (pEnum == 1)
+                method = new SDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), 
+					ProjectionEnum::RAND, strToInt(cmdLine.get_arg("-noOfBaseVectors")), EUCLIDEAN); //may be manhatan or chebyshew
+            else if (pEnum == 2)
+                method = new SDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), 
+					ProjectionEnum::PCA, strToInt(cmdLine.get_arg("-noOfBaseVectors")), EUCLIDEAN); //may be manhatan or chebyshew
+            else
+                method = new SDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), 
+					ProjectionEnum::DISPERSION, strToInt(cmdLine.get_arg("-noOfBaseVectors")), EUCLIDEAN); //may be manhatan or chebyshew
+
+            //std::cout << strToDouble(cmdLine.get_arg("-eps")) <<" "<< strToInt(cmdLine.get_arg("-maxIter")) <<" "<< 
+			//strToInt(cmdLine.get_arg("-d")) <<" "<< strToInt(cmdLine.get_arg("-selStrategy")) <<" "<< 
+			//strToInt(cmdLine.get_arg("-noOfBaseVectors")) <<" "<< EUCLIDEAN;
+            paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+			         break;
+        case "SMACOFMDS":
+            tmp = cmdLine.get_arg("-zeidel");
+            std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+            if (tmp == "0" || tmp == "FALSE")
+            {
+                //	SMACOF(double eps, int maxIter, int d);
+                double eps = strToDouble(cmdLine.get_arg("-eps"));
+                int maxIter = strToInt(cmdLine.get_arg("-maxIter"));
+                int d = strToInt(cmdLine.get_arg("-d"));
+
+                SMACOF *method = new SMACOF(eps, maxIter, d);
+                //std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter")) << strToInt(cmdLine.get_arg("-d"))
+				//<< cmdLine.get_arg("-zeidel");
+                paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+                //paralelCompute(pid, 5, method, resultFile, statFile);
+            }
+            else
+            {
+                //SMACOFZEIDEL(double eps, int maxIter, int d, ShufleEnum shEnum);
+                SMACOFZEIDEL *method = new SMACOFZEIDEL(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")),
+				strToInt(cmdLine.get_arg("-d")), RANDOM); // sorting method may be other
+                //std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter")) << strToInt(cmdLine.get_arg("-d"))
+				//<< BUBLESORTDSC << (cmdLine.get_arg("-zeidel"));
+                paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+            }
+			         break;
+        case "SAMANN":
+            //SAMANN(int m1, int nl, double eta, int maxIter);
+            SAMANN *method = new SAMANN(strToInt(cmdLine.get_arg("-mTrain")), strToInt(cmdLine.get_arg("-nNeurons")),
+			strToDouble(cmdLine.get_arg("-eta")), strToInt(cmdLine.get_arg("-maxIter")));
+            //std::cout << strToInt(cmdLine.get_arg("-mTrain")) << strToInt(cmdLine.get_arg("-nNeurons")) << strToDouble(cmdLine.get_arg("-eta"))
+			//<< strToInt(cmdLine.get_arg("-maxIter"));
+            paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+			         break;
+        case "SOMMDS":
+            //SOMMDS(double eps, int max_iter, int d, int kx, int ky, int e_hat);
+            //SOMMDS mthd11(epsilon, maxIter, d, 100, 3, 5);
+            SOMMDS *method = new SOMMDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")),
+			strToInt(cmdLine.get_arg("-mdsProjection")),strToInt(cmdLine.get_arg("-rows")),strToInt(cmdLine.get_arg("-columns")),
+			strToInt(cmdLine.get_arg("-eHat")));
+            //method.
+//            std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter"))
+			//<< strToInt(cmdLine.get_arg("-mdsProjection")) << strToInt(cmdLine.get_arg("-rows")) 
+			//<< strToInt(cmdLine.get_arg("-columns")) << strToInt(cmdLine.get_arg("-eHat"));
+            paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+			         break;
+        case "SOM":
+            SOM *method = new SOM(strToInt(cmdLine.get_arg("-rows")),strToInt(cmdLine.get_arg("-columns")),
+			strToInt(cmdLine.get_arg("-eHat")));
+            // std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns"))
+			//<<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
+            paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+            break;
+        case "KMEANS":
+                  KMEANS *method = new KMEANS(strToInt(cmdLine.get_arg("-noOfClust")),strToInt(cmdLine.get_arg("-maxIter")));
+            // std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns"))
+			//<<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
+                  paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+				          break;
+         case "MLP":
+            tmp = cmdLine.get_arg("-kFoldVal");
+            std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+            bool kFoldValidation = true;
+            if (tmp == "0" || tmp == "FALSE")
+            {
+                kFoldValidation =false;
+            }
+            //  KMEANS *method = new KMEANS(strToInt(cmdLine.get_arg("-noOfClust")),strToInt(cmdLine.get_arg("-maxIter")));
+                MLP *method = new MLP(strToInt(cmdLine.get_arg("-h1pNo")), strToInt(cmdLine.get_arg("-h2pNo")),
+				strToDouble(cmdLine.get_arg("-qty")), strToInt(cmdLine.get_arg("-maxIter")), kFoldValidation);
+            // std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns"))
+			//<<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
+                paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+         case "DECTREE":
+                //  KMEANS *method = new KMEANS(strToInt(cmdLine.get_arg("-noOfClust")),strToInt(cmdLine.get_arg("-maxIter")));
+                DECTREE *method = new DECTREE(strToDouble(cmdLine.get_arg("-dL")), strToDouble(cmdLine.get_arg("-dT")),
+				strToDouble(cmdLine.get_arg("-r")), strToInt(cmdLine.get_arg("-nTree")));
+            // std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns"))
+			//<<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
+                paralelCompute(pid, numOfProcs, method, resultFile, statFile);
+        default:
+          std::cout << "Unknown algorithm call" << std::endl;
+        }
     }
     else
     {
@@ -129,115 +255,6 @@ int main(int argc, char** argv)
     MPI_Finalize();
 //AdditionalMethods::deleteFile();//
     return 0;
-}
-
-void FindAlgorithm(std::string &tmp, CommandLineParser &cmdLine, int pid, int numOfProcs, std::string &resultFile, std::string &statFile)
-{
-	switch (tmp) // <- ThisMM
-	{
-	case "PCA":
-		tmp = cmdLine.get_arg("-projType");
-		std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-
-		if (tmp == "0" || tmp == "FALSE")
-		{
-			PCA_ *method = new PCA_(strToInt(cmdLine.get_arg("-d")), false);
-			paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		}
-		else
-		{
-			PCA_ *method = new PCA_(strToDouble(cmdLine.get_arg("-d")), true);
-
-			paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		}
-		break;
-	case "DMA":
-		DMA * method = new DMA(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), strToInt(cmdLine.get_arg("-neighbour")));
-		//std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter")) << strToInt(cmdLine.get_arg("-d")) << strToInt(cmdLine.get_arg("-neighbour"));
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		break;
-	case "RELATIVEMDS":
-		int pEnum = strToInt(cmdLine.get_arg("-selStrategy"));
-		//SDS(double eps, int maxIter, int d, ProjectionEnum baseVectInitt, int nofBaseVect, DistanceMetricsEnum distMetrics);
-		SDS *method;
-
-		if (pEnum == 1)
-			method = new SDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), ProjectionEnum::RAND, strToInt(cmdLine.get_arg("-noOfBaseVectors")), EUCLIDEAN); //may be manhatan or chebyshew
-		else if (pEnum == 2)
-			method = new SDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), ProjectionEnum::PCA, strToInt(cmdLine.get_arg("-noOfBaseVectors")), EUCLIDEAN); //may be manhatan or chebyshew
-		else
-			method = new SDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), ProjectionEnum::DISPERSION, strToInt(cmdLine.get_arg("-noOfBaseVectors")), EUCLIDEAN); //may be manhatan or chebyshew
-
-																																																								  //std::cout << strToDouble(cmdLine.get_arg("-eps")) <<" "<< strToInt(cmdLine.get_arg("-maxIter")) <<" "<< strToInt(cmdLine.get_arg("-d")) <<" "<< strToInt(cmdLine.get_arg("-selStrategy")) <<" "<< strToInt(cmdLine.get_arg("-noOfBaseVectors")) <<" "<< EUCLIDEAN;
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		break;
-	case "SMACOFMDS":
-		tmp = cmdLine.get_arg("-zeidel");
-		std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-		if (tmp == "0" || tmp == "FALSE")
-		{
-			//	SMACOF(double eps, int maxIter, int d);
-			double eps = strToDouble(cmdLine.get_arg("-eps"));
-			int maxIter = strToInt(cmdLine.get_arg("-maxIter"));
-			int d = strToInt(cmdLine.get_arg("-d"));
-
-			SMACOF *method = new SMACOF(eps, maxIter, d);
-			//std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter")) << strToInt(cmdLine.get_arg("-d")) << cmdLine.get_arg("-zeidel");
-			paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-			//paralelCompute(pid, 5, method, resultFile, statFile);
-		}
-		else
-		{
-			//SMACOFZEIDEL(double eps, int maxIter, int d, ShufleEnum shEnum);
-			SMACOFZEIDEL *method = new SMACOFZEIDEL(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-d")), RANDOM); // sorting method may be other
-																																										   //std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter")) << strToInt(cmdLine.get_arg("-d")) << BUBLESORTDSC << (cmdLine.get_arg("-zeidel"));
-			paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		}
-		break;
-	case "SAMANN":
-		//SAMANN(int m1, int nl, double eta, int maxIter);
-		SAMANN * method = new SAMANN(strToInt(cmdLine.get_arg("-mTrain")), strToInt(cmdLine.get_arg("-nNeurons")), strToDouble(cmdLine.get_arg("-eta")), strToInt(cmdLine.get_arg("-maxIter")));
-		//std::cout << strToInt(cmdLine.get_arg("-mTrain")) << strToInt(cmdLine.get_arg("-nNeurons")) << strToDouble(cmdLine.get_arg("-eta")) << strToInt(cmdLine.get_arg("-maxIter"));
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		break;
-	case "SOMMDS":
-		//SOMMDS(double eps, int max_iter, int d, int kx, int ky, int e_hat);
-		//SOMMDS mthd11(epsilon, maxIter, d, 100, 3, 5);
-		SOMMDS * method = new SOMMDS(strToDouble(cmdLine.get_arg("-eps")), strToInt(cmdLine.get_arg("-maxIter")), strToInt(cmdLine.get_arg("-mdsProjection")), strToInt(cmdLine.get_arg("-rows")), strToInt(cmdLine.get_arg("-columns")), strToInt(cmdLine.get_arg("-eHat")));
-		//method.
-		//            std::cout << strToDouble(cmdLine.get_arg("-eps")) << strToInt(cmdLine.get_arg("-maxIter")) << strToInt(cmdLine.get_arg("-mdsProjection")) << strToInt(cmdLine.get_arg("-rows")) << strToInt(cmdLine.get_arg("-columns")) << strToInt(cmdLine.get_arg("-eHat"));
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		break;
-	case "SOM":
-		SOM * method = new SOM(strToInt(cmdLine.get_arg("-rows")), strToInt(cmdLine.get_arg("-columns")), strToInt(cmdLine.get_arg("-eHat")));
-		// std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns")) <<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		break;
-	case "KMEANS":
-		KMEANS * method = new KMEANS(strToInt(cmdLine.get_arg("-noOfClust")), strToInt(cmdLine.get_arg("-maxIter")));
-		// std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns")) <<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-		break;
-	case "MLP":
-		tmp = cmdLine.get_arg("-kFoldVal");
-		std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-		bool kFoldValidation = true;
-		if (tmp == "0" || tmp == "FALSE")
-		{
-			kFoldValidation = false;
-		}
-		//  KMEANS *method = new KMEANS(strToInt(cmdLine.get_arg("-noOfClust")),strToInt(cmdLine.get_arg("-maxIter")));
-		MLP *method = new MLP(strToInt(cmdLine.get_arg("-h1pNo")), strToInt(cmdLine.get_arg("-h2pNo")), strToDouble(cmdLine.get_arg("-qty")), strToInt(cmdLine.get_arg("-maxIter")), kFoldValidation);
-		// std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns")) <<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-	case "DECTREE":
-		//  KMEANS *method = new KMEANS(strToInt(cmdLine.get_arg("-noOfClust")),strToInt(cmdLine.get_arg("-maxIter")));
-		DECTREE * method = new DECTREE(strToDouble(cmdLine.get_arg("-dL")), strToDouble(cmdLine.get_arg("-dT")), strToDouble(cmdLine.get_arg("-r")), strToInt(cmdLine.get_arg("-nTree")));
-		// std::cout << strToInt(cmdLine.get_arg("-rows")) << "-rows" <<  strToInt(cmdLine.get_arg("-columns")) <<"-columns" << strToInt(cmdLine.get_arg("-eHat")) << "-eHat";
-		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
-	default:
-		std::cout << "Unknown algorithm call" << std::endl;
-	}
 }
 
 template <typename T>
@@ -332,7 +349,8 @@ void paralelCompute(int pid, int numOfProcs, T *mthd, std::string resultFile, st
                     m = mm;
                 }*/
  //std::cout << "Procesorius  " << pid  << " gavo matrica" << std::endl;
-               // Y = AdditionalMethods::DoubleToObjectMatrix(receiveArray, n, m); // gra=ianams tik skai2iai realiai priskirti negalima kadangi dingsta kals4s
+               // Y = AdditionalMethods::DoubleToObjectMatrix(receiveArray, n, m);
+			   // gra=ianams tik skai2iai realiai priskirti negalima kadangi dingsta kals4s
                 receiveArray = AdditionalMethods::Array2D(n, m);
                 MPI_Recv(&(receiveArray[0][0]), n * m, MPI_DOUBLE, min_rank, min_rank, MPI_COMM_WORLD, &status);   // priimama Y data dali
                 Y = AdditionalMethods::DoubleToObjectMatrix(receiveArray, n, m);
