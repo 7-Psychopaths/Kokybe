@@ -120,14 +120,8 @@ ObjectMatrix MLP::getProjection()
 
 double MLP::getStress()
 {
-    if (this->kFoldValidation)
-    {
-        return rep.avgrelerror;
-    }
-    else
-    {
-        return repp.avgrelerror;
-    }
+    if (this->kFoldValidation) return rep.avgrelerror;
+    else return repp.avgrelerror;
 //}
     /*
     * Rep.RelCLSError - fraction of misclassified cases.

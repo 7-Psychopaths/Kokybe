@@ -131,4 +131,3 @@ ObjectMatrix Projection::projectMatrix(ProjectionEnum projEnum, ObjectMatrix obj
 
     return  projection;
 }
-

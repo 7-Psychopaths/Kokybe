@@ -66,7 +66,7 @@ void ARFF::readArffFile()
     std::vector<double> doubleVector; doubleVector.reserve(0);
 
     int line_no = 1;
-    if (file.is_open() != false)
+    if (file.is_open())
     {
         readSuccess = true;
         while (std::getline(file, line_from_file))
@@ -373,5 +373,3 @@ bool ARFF::isSuccessfullyRead()
 {
     return readSuccess;
 }
-
-

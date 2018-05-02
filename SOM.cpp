@@ -119,7 +119,7 @@ ObjectMatrix SOM::getProjection()
         }
     }
 
-    if (returnWinners == false)
+    if (!(returnWinners))
         nWinner = X;
 
     std::vector<std::string> objClass;
@@ -127,13 +127,13 @@ ObjectMatrix SOM::getProjection()
     {
 		findShortestDistance(win_dist, win_x, win_y, objXtmp, l, dist_ij, M);
 
-        if (returnWinners == false)
+        if (!(returnWinners))
             objClass.push_back(std::to_string(static_cast<long long>(win_x)) + "-" + std::to_string(static_cast<long long>(win_y)));
         else
             M_w.addObject(M->getObjectAt(win_x, win_y));
     }
     std::vector<std::string> diffObjClaseses;
-    if (returnWinners == false)
+    if (!(returnWinners))
     {
         diffObjClaseses = objClass;
         //remove dublicates

@@ -206,6 +206,7 @@ void FindAlgorithm(std::string &tmp, CommandLineParser &cmdLine, int pid, int nu
 		paralelCompute(pid, numOfProcs, method, resultFile, statFile);
 	default:
 		std::cout << "Unknown algorithm call" << std::endl;
+    break;
 	}
 }
 

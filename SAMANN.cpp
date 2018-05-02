@@ -365,10 +365,7 @@ bool SAMANN::isIdentical(DataObject obj)
         for (int j = 0; j < m; j++)
             if (obj.getFeatureAt(j) == objXi.getFeatureAt(j))
                 k++;
-        if (k == m)
-        {
-            return true;
-        }
+        if (k == m) return true;
     }
     return false;
 }
