@@ -39,8 +39,8 @@ ObjectMatrix KMEANS::getProjection()
 
     alglib::clusterizercreate(s);
     alglib::clusterizersetpoints(s, input, 2); //2 means Euclidean distances
-    alglib::clusterizersetkmeanslimits(s, 1, this->maxIter);	//1 means quantity of restarts, 
-																//if maxIter = 0 then unlimited number of iterations are performed
+    alglib::clusterizersetkmeanslimits(s, 1, this->maxIter);	//1 means quantity of restarts,
+    //if maxIter = 0 then unlimited number of iterations are performed
     alglib::clusterizerrunkmeans(s, ClusterizationMethods::getNoOfClusters(), rep);
 
     Y = X;
@@ -51,11 +51,11 @@ ObjectMatrix KMEANS::getProjection()
 
     if (int(rep.terminationtype) == 1) //if success
     {
-        for ( int i = 0; i < ClusterizationMethods::getNoOfReturnRows(); i++ ) // updates return Y matrix class values 
-																			   //(sets to those returned by kmeans)
-                Y.updateDataObjectClass(i, rep.cidx(i));
+        for ( int i = 0; i < ClusterizationMethods::getNoOfReturnRows(); i++ ) // updates return Y matrix class values
+            //(sets to those returned by kmeans)
+            Y.updateDataObjectClass(i, rep.cidx(i));
     }
-     return Y;
+    return Y;
 }
 
 double KMEANS::getStress()
