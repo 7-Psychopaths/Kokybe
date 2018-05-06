@@ -57,6 +57,7 @@ ObjectMatrix KMEANS::getProjection()
     return Y;
 }
 
+
 double KMEANS::getStress()
 {
     return 0.0;

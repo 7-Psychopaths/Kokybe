@@ -7,8 +7,8 @@ MLP::MLP()
 MLP::MLP(int h1pNo, int h2pNo, double qtty, int maxIter, bool validationMethod)
 {
     //no of neurons in hidden layer
-    h1No = h1pNo;
-    h2No = h2pNo;
+    HiddenNeuronsNo1 = h1pNo;
+    HiddenNeuronsNo2 = h2pNo;
     this->maxIter = maxIter;
     this->kFoldValidation = validationMethod;
 
@@ -20,16 +20,16 @@ MLP::MLP(int h1pNo, int h2pNo, double qtty, int maxIter, bool validationMethod)
     mlpsetcond(trn, wstep, this->maxIter);     // * we choose iterations limit as stopping condition
     //(another condition - step size - is zero, which means than this condition is not active)
 
-    if ((h1No > 0) && (h2No > 0))
-        alglib::mlpcreatec2(X.getObjectAt(0).getFeatureCount(), h1No, h2No, X.getClassCount(), network);
+    if ((HiddenNeuronsNo1 > 0) && (HiddenNeuronsNo2 > 0))
+        alglib::mlpcreatec2(X.getObjectAt(0).getFeatureCount(), HiddenNeuronsNo1, HiddenNeuronsNo2, X.getClassCount(), network);
     //create nn network with noofinput features, 2 hidden layers, noofclasses (and sore to network variable)
-    if ((h1No > 0) && (h2No == 0))
-        alglib::mlpcreatec1(X.getObjectAt(0).getFeatureCount(), h1No, X.getClassCount(), network);
+    if ((HiddenNeuronsNo1 > 0) && (HiddenNeuronsNo2 == 0))
+        alglib::mlpcreatec1(X.getObjectAt(0).getFeatureCount(), HiddenNeuronsNo1, X.getClassCount(), network);
     //create nn network with no of input features, 1 hidden layer, noofclasses (and sore to network variable)
-    if ((h1No == 0) && (h2No == 0))
+    if ((HiddenNeuronsNo1 == 0) && (HiddenNeuronsNo2 == 0))
         alglib::mlpcreatec0(X.getObjectAt(0).getFeatureCount(), X.getClassCount(), network);
     //create nn network with no of input features, 0 hidden layer, noofclasses (and sore to network variable)
-///h2No must be non zero
+///HiddenNeuronsNo2 must be non zero
 
     if (this->kFoldValidation == true) //do kfold validation
     {
@@ -63,24 +63,24 @@ MLP::~MLP()
 
 ObjectMatrix MLP::getProjection()
 {
-    int ftCount = X.getObjectAt(0).getFeatureCount();
+    int featureCount = X.getObjectAt(0).getFeatureCount();
     int objCount = X.getObjectCount();
 
-    initializeYMatrix(objCount, ftCount + X.getClassCount());
+    initializeYMatrix(objCount, featureCount + X.getClassCount());
 
     alglib::real_1d_array tmpYObj;
     alglib::real_1d_array tmpXObj;
 
-    tmpYObj.setlength(ftCount);
+    tmpYObj.setlength(featureCount);
     tmpXObj.setlength(X.getClassCount());
 
-    DataObject tmpO;
+    DataObject tempObj;
     for (int i = 0; i < objCount; i++)
     {
-        tmpO = X.getObjectAt(i);
-        for (int ft = 0; ft < ftCount; ft++)
+        tempObj = X.getObjectAt(i);
+        for (int ft = 0; ft < featureCount; ft++)
         {
-            double feature = tmpO.getFeatureAt(ft);
+            double feature = tempObj.getFeatureAt(ft);
             tmpYObj(ft) = feature;
             Y.updateDataObject(i, ft, feature);
         }
@@ -92,7 +92,7 @@ ObjectMatrix MLP::getProjection()
 
         for (int j = 0; j < X.getClassCount(); j++)
         {
-            Y.updateDataObject(i, j + ftCount, tmpXObj(j));
+            Y.updateDataObject(i, j + featureCount, tmpXObj(j));
             if (max_prob < tmpXObj(j))
             {
                 max_prob = tmpXObj(j);
@@ -100,8 +100,8 @@ ObjectMatrix MLP::getProjection()
             }
         }
 
-        if (tmpO.getClassLabel() != -1)
-            Y.updateDataObjectClass(i, tmpO.getClassLabel());
+        if (tempObj.getClassLabel() != -1)
+            Y.updateDataObjectClass(i, tempObj.getClassLabel());
         else
             Y.updateDataObjectClass(i, indx);
     }
