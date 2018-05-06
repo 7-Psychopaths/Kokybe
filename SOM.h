@@ -105,5 +105,7 @@ private:
      */
     bool returnWinners;
 
+    void InitializeRandom(int n, ObjectMatrix * M, DataObject &objMtmp);
+
 };
 #endif // !defined(SOM_H)
