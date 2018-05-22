@@ -140,8 +140,7 @@ private:
      */
     ObjectMatrix tmpX;
 
-    void initializeBestWeights(int n, std::vector<std::vector<double>> &best_w1, std::vector<std::vector<double>> &best_w2) const;
-
+    void initializeBestWeights(int n, std::vector<std::vector<double>> &best_w1, std::vector<std::vector<double>> &best_w2);
     void stressTest(int n, double bestStress, double currStress, std::vector<std::vector<double>> &best_w1,
                     std::vector<std::vector<double>> &best_w2);
 };

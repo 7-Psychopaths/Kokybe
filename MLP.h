@@ -41,14 +41,14 @@ class MLP : public ClusterizationMethods
 
     private:
 
-        /*! \var int h1No;
+        /*! \var int HiddenNeuronsNo1;
          *  \brief Number of neurons in first hidden layer
          */
-        int h1No;
-        /*! \var int h2No;
+        int HiddenNeuronsNo1;
+        /*! \var int HiddenNeuronsNo2;
          *  \brief Number of neurons in first hidden layer
          */
-        int h2No;
+        int HiddenNeuronsNo2;
         /*! \var int maxIter;
          *  \brief Number of iterations
          */

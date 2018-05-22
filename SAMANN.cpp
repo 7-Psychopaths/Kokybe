@@ -252,7 +252,7 @@ void SAMANN::stressTest(int n, double bestStress, double currStress, std::vector
 
 void SAMANN::initializeBestWeights(int n, std::vector<std::vector<double>> &best_w1,
                                    std::vector<std::vector<double>> &best_w2) const {
-    std::__1::vector<double> w1Row, w2Row;
+    std::vector<double> w1Row, w2Row;
     w1Row.reserve(n + 1);
     w2Row.reserve(nNeurons + 1);
     for (int i = 0; i < nNeurons + 1; i++)
